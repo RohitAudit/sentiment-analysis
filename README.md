@@ -13,10 +13,23 @@ This project helps in identifying whether a particular movie review is positive 
 * Matplotlib
 * ScikitLearn
 
-**For Windows**
+**For Windows Powershell**
 ```
 python -m pip install numpy
 ```
+
+or if you have **Anaconda** installed
+```
+conda install numpy
+```
+
+## Theory 
+
+Simple words can't be processed directly as computer doesn't understand them. So, they have to be parsed and converted into meaningful format which is easily understood by our computer. 
+For doing what is mentioned above following steps are followed:
+**Step 1:** Tokenize them into smaller segments(mostly words)
+**Step 2:** Remove stopwords(words that occur very oftenly like a,the,of,and etc.)
+**Step 3:** Make bag of frequency matrix which keep count of all the different words occuring in a text
 
 
 
