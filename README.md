@@ -1,4 +1,4 @@
-#Sentiment Analysis
+# Sentiment Analysis
 
 This project helps in identifying whether a particular movie review is positive or negative depending on the training set present which is used to train our classifier.
 
