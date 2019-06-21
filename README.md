@@ -13,10 +13,11 @@ This project helps in identifying whether a particular movie review is positive 
 * Matplotlib
 * ScikitLearn
 
-**For Windows**
-'''
+** For Windows **
+```
 python -m pip install numpy
-'''
+```
+
 
 
 ROC score =0.734385715685314(Area under curve)
