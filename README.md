@@ -76,6 +76,7 @@ Actual negative      |       381          |      48
 Actual positive      |       327          |      644
 
 
+*** Thus, it can be seen that Multimonial Naive Bayes is more accurate than Gaussian Naive Bayes***
 
 
 
