@@ -23,7 +23,7 @@ or if you have **Anaconda** installed
 conda install numpy
 ```
 
-in **Unix*8 you can directly use pip install
+in **Unix** you can directly use pip install
 
 ## Theory 
 
@@ -37,9 +37,13 @@ For doing what is mentioned above follow the steps below: <br/>
 
 ***Classifying the text*** <br/>
 In this problem movie reviews were tagged with the sentiment beforehand. Thus, we can use them to train our classifier according to the classification rules.<br/>
+**Step 5:** Split the dataset into training and testing datasets<br/>
+**Step 6:** Select the classifier and train the model with training dataset<br/>
+**Step 7:** Predict the test dataset and measure accuracy<br/>
 
 ***Analysing the text***<br/>
-
+**AUC score** (Area under curve) gives the measure of accuracy of the algorithm<br/>
+**Confusion Matrix** gives a measure of the actual and predicted values<br/>
 
 
 
