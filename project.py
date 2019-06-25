@@ -11,71 +11,73 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import roc_curve
 from sklearn.metrics import roc_auc_score
 
-q = []
-s = []
-l = []
-#reading the files in pos folder
-for file in os.listdir("c:/python27/IItb/movie_reviews/movie_reviews/pos"):
-	if file.endswith(".txt"):
-		p = os.path.join(file)
-		q.append(p)
-		path = 'c:/python27/IItb/movie_reviews/movie_reviews/pos/%s'%file
-		with open(path,"r+") as myfile:
-			r = myfile.read()
-			s.append(r)
-		k = 1
-		l.append(k)
-#reading the file in neg folder
-for file in os.listdir("c:/python27/IItb/movie_reviews/movie_reviews/neg"):
-	if file.endswith(".txt"):
-		p = os.path.join(file)
-		q.append(p)
-		path = 'c:/python27/IItb/movie_reviews/movie_reviews/neg/%s'%file
-		with open(path,"r") as myfile:
-			r = myfile.read()
-			s.append(r)
-		k = 0
-		l.append(k)
+def readfile():
+	filepath = []
+	review = []
+	sentiment = []
+	#reading the files in pos folder
+	for file in os.listdir("C:/Users/roaggarw/Documents/NLP/sentiment_analysis/sentiment-analysis/movie_reviews/pos"):
+		if file.endswith(".txt"):
+			p = os.path.join(file)
+			filepath.append(p)
+			path = 'C:/Users/roaggarw/Documents/NLP/sentiment_analysis/sentiment-analysis/movie_reviews/pos/%s'%file
+			with open(path,"r+") as myfile:
+				review.append(myfile.read())
+			sentiment.append(1)
+	#reading the file in neg folder
+	for file in os.listdir("C:/Users/roaggarw/Documents/NLP/sentiment_analysis/sentiment-analysis/movie_reviews/neg"):
+		if file.endswith(".txt"):
+			p = os.path.join(file)
+			filepath.append(p)
+			path = 'C:/Users/roaggarw/Documents/NLP/sentiment_analysis/sentiment-analysis/movie_reviews/neg/%s'%file
+			with open(path,"r") as myfile:
+				review.append(myfile.read())
+			sentiment.append(0)
+	j = {'review':review,'sentiment':sentiment}
+	return pd.DataFrame(j)
 
+def plotROC(x,y):
+	plt.title('Receiver Operating Characteristic')
+	plt.plot(x,y)
+	plt.legend(loc='lower right')
+	plt.plot([0,1],[0,1],'r--')
+	plt.ylabel('True Positive Rate')
+	plt.xlabel('False Positive Rate')
+	plt.show()
 
-	
-j = {'review':s,'sentiment':l}
-vectorizer = TfidfVectorizer(use_idf=True, lowercase=True, strip_accents='ascii')
-p = pd.DataFrame(j,q)#panda DataFrame
-X = vectorizer.fit_transform(p.review)#frequency matrix
-y = p.sentiment
-
-	
-def multimonialnaivebaiyes(X,y):
+def splitTrainTest(Dataframe):
+	vectorizer = TfidfVectorizer(use_idf=True, lowercase=True, strip_accents='ascii')
+	X = vectorizer.fit_transform(readfile().review)#frequency matrix
+	y = readfile().sentiment
 	X_train,X_test,y_train,y_test = train_test_split(X.toarray(), y, test_size=0.3, random_state=0)
+	trainset={'review':X_train,'sentiment':y_train}
+	testset={'review':X_test,'sentiment':y_test}
+	return trainset,testset
+
+	
+def multimonialnaivebaiyes(test):
 	mnb = MultinomialNB()#multimonial type naive bayes
-	y_pred_mnb = mnb.fit(X_train,y_train).predict(X_test)#predicting sentiment of review with multimonial NB for test case
-	y_pred_mnb2 = mnb.fit(X_test,y_test).predict(X_train)#predicting for training case
-	cnf_matrix_mnb = confusion_matrix(y_test, y_pred_mnb)#confusion matrix for test case
-	cnf_matrix_mnb2 = confusion_matrix(y_train, y_pred_mnb2)#confusion matrix fot training case
-	fpr, tpr, threshold = roc_curve(y_train, y_pred_mnb2)#plotting ROC curve
-	return y_pred_mnb,y_pred_mnb2,cnf_matrix_mnb,cnf_matrix_mnb2,fpr,tpr
+	train = splitTrainTest(readfile())[0]
+	y_pred_mnb = mnb.fit(train['review'],train['sentiment']).predict(test)#predicting sentiment of review with multimonial NB for test case
+	return y_pred_mnb
 	
-def gaussiannaivebaiyes(X,y):
-	X_train,X_test,y_train,y_test = train_test_split(X.toarray(), y, test_size=0.3, random_state=0)
+def gaussiannaivebaiyes(test):
 	gnb = GaussianNB()#gaussian type naive bayes
-	y_pred_gnb = gnb.fit(X_train, y_train).predict(X_test)#predicting with gaussian NB
-	y_pred_gnb2 = gnb.fit(X_test,y_test).predict(X_train)#predicting for training case
-	cnf_matrix_gnb = confusion_matrix(y_test, y_pred_gnb)#confusion matrix for test case
-	cnf_matrix_gnb2 = confusion_matrix(y_train, y_pred_gnb2)#confusion matrix fot training case
-	fpr, tpr, threshold = roc_curve(y_test, y_pred_gnb)
-	return y_pred_gnb,y_pred_gnb2,cnf_matrix_gnb,cnf_matrix_gnb2,fpr,tpr
+	train = splitTrainTest(readfile())[0]
+	y_pred_gnb = gnb.fit(train['review'],train['sentiment']).predict(test)#predicting with gaussian NB
+	return y_pred_gnb
 
+def importantParam(predicted,original):
+	cnf_matrix_gnb = confusion_matrix(original, predicted)
+	fpr, tpr, threshold = roc_curve(original, predicted)
+	AUC_score = np.trapz(fpr,tpr)
+	return cnf_matrix_gnb,AUC_score , fpr, tpr
 
-#plotting ROC curve
+	
+test = splitTrainTest(readfile())[1]
+test_predict = multimonialnaivebaiyes(test['review'])
+#test_predict = gaussiannaivebaiyes(test.review)
+param = importantParam(test_predict,test['sentiment'])
+print(param[1])
 
-plt.title('Receiver Operating Characteristic')
-plt.plot(multimonialnaivebaiyes(X,y)[4], multimonialnaivebaiyes(X,y)[5])
-plt.legend(loc='lower right')
-plt.plot([0,1],[0,1],'r--')
-plt.ylabel('True Positive Rate')
-plt.xlabel('False Positive Rate')
-plt.show()
-
-
-print(np.trapz(multimonialnaivebaiyes(X,y)[5], multimonialnaivebaiyes(X,y)[4]))	#printing ROC_auc_score
+plotROC(param[2],param[3])
